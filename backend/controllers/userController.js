@@ -1,5 +1,7 @@
 import User from "../models/userModel.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import crypto from "crypto";
+import sendEmail from "../utils/sendEmail.js";
 
 const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
@@ -8,6 +10,8 @@ const registerUser = asyncHandler(async (req, res) => {
       message: "All fields are required",
     });
   }
+  // console.log(username, password, email);
+
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     return res.status(400).json({
@@ -20,14 +24,27 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
   });
   try {
+    user.verificationToken = crypto.randomBytes(32).toString("hex");
     await user.save();
     const token = user.generateToken(user._id);
+    const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${user.verificationToken}`;
+
+    // console.log("Sending verification email to:", user.email);
+    // console.log("Verification URL:", verifyUrl);
+
+    await sendEmail(
+      user.email,
+      "Verify your email",
+      `<a href="${verifyUrl}">Verify Email</a>`
+    );
+
     res.cookie("jwt", token, {
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       sameSite: "strict",
       secure: process.env.NODE_ENV !== "development",
     });
+
     res.status(201).json({
       message: "User registered successfully",
       user: {
@@ -40,6 +57,7 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(500).json({
       message: "Error registering user",
     });
+    console.error("Registration Error:", error);
   }
 });
 
@@ -158,6 +176,53 @@ const deleteUser = asyncHandler(async (req, res) => {
   });
 });
 
+const verifyEmail = asyncHandler(async (req, res) => {
+  const user = await User.findOne({ verificationToken: req.query.token });
+
+  if (!user) {
+    return res.status(400).json({ message: "invaild token" });
+  }
+  (user.isVerified = true), (user.verificationToken = undefined);
+  await user.save();
+  res.status(200).json({ message: "Email verified successfully" });
+});
+const forgetPassword = asyncHandler(async (req, res) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  user.resetPasswordToken = crypto.randomBytes(32).toString("hex");
+  user.resetPasswordExpires = Date.now() + 60 * 60 * 1000;
+  await user.save();
+
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${user.resetPasswordToken}`;
+  await sendEmail(
+    user.email,
+    "Reset Your Password",
+    `<a href="${resetUrl}">Reset Password</a>`
+  );
+
+  res.status(200).json({ message: "Password reset link sent" });
+});
+
+const resetpassword = asyncHandler(async (req, res) => {
+  const token = req.query.token;
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  if (!user)
+    return res.status(400).json({ message: "Invalid or expired token" });
+
+  user.password = req.body.newPassword;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  res.status(200).json({ message: "Password has been reset" });
+});
 export {
   registerUser,
   loginUser,
@@ -166,4 +231,7 @@ export {
   getUserProfile,
   updateUserProfile,
   deleteUser,
+  verifyEmail,
+  forgetPassword,
+  resetpassword,
 };

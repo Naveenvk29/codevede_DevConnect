@@ -1,19 +1,32 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-
 import userRoutes from "./routes/userRoutes.js";
-
+import sendEmail from "./utils/sendEmail.js";
 const app = express();
 
-app.use(cors);
-app.use(cookieParser);
-app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:3000", // match your frontend
+    credentials: true, // important for cookies
+  })
+);
+app.use(cookieParser()); // FIXED: add ()
+app.use(express.json()); // FIXED: must include this
 
 app.get("/", (req, res) => {
-  res.send("hello from server");
+  res.send("Hello from server");
 });
 
 app.use("/api/v1/users", userRoutes);
+app.get("/test-email", async (req, res) => {
+  try {
+    await sendEmail("lsagsnvk@gmail.com", "Test", "<p>It works!</p>");
+    res.send("Sent!");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Failed");
+  }
+});
 
 export { app };

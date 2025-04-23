@@ -7,8 +7,11 @@ import {
   getUserProfile,
   updateUserProfile,
   deleteUser,
-} from "../controllers/userControllers.js";
-import { isAuthenticated, isAdmin } from "../middlewares/authMiddleware.js";
+  verifyEmail,
+  forgetPassword,
+  resetpassword,
+} from "../controllers/userController.js";
+import { isAuthenticated } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -21,5 +24,7 @@ router
   .get(isAuthenticated, getUserProfile)
   .put(isAuthenticated, updateUserProfile)
   .delete(isAuthenticated, deleteUser);
-
+router.get("/verify-email", verifyEmail);
+router.post("/forgot-password", forgetPassword);
+router.post("/reset-password", resetpassword);
 export default router;

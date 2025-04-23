@@ -1,17 +1,16 @@
 import mongoose from "mongoose";
 
-const DB_NAME = "Auth_blog_codeveda";
-
 const connectdb = async () => {
   try {
-    const connectInstruct = await mongoose.connect(
-      `${process.env.MONGODB_URL}/${DB_NAME}`
-    );
+    const connectInstruct = await mongoose.connect(process.env.MONGODB_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log(
-      `successfully connect with mongodb${connectInstruct.connection.host}`
+      `✅ Successfully connected to MongoDB: ${connectInstruct.connection.host}`
     );
   } catch (error) {
-    console.log(error);
+    console.error("❌ MongoDB connection error:", error.message);
     process.exit(1);
   }
 };
