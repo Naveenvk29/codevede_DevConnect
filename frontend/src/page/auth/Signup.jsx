@@ -32,7 +32,7 @@ const signup = () => {
     }
   };
   return (
-    <div className=" bg-slate-50 flex justify-center items-center w-full">
+    <div className="min-h-screen bg-slate-50 flex justify-center items-center w-full">
       <form onSubmit={handleSubmit}>
         <div className="bg-white px-10 py-8 rounded-xl w-screen shadow-md max-w-sm">
           <div className="space-y-4">

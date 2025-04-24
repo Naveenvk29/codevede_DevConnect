@@ -5,6 +5,7 @@ import {
   useFetchUserProfileQuery,
   useUpdateUserProfileMutation,
   useDeleteUserMutation,
+  useLogoutMutation,
 } from "../../redux/api/userApi";
 import { setCredentials, logout } from "../../redux/features/authSlice";
 import { toast } from "react-toastify";
@@ -19,6 +20,8 @@ const Profile = () => {
   const [updateProfile, { isLoading: isUpdating }] =
     useUpdateUserProfileMutation();
   const [deleteUser] = useDeleteUserMutation();
+
+  const [logoutApi] = useLogoutMutation();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -63,6 +66,16 @@ const Profile = () => {
       toast.error(err?.data?.message || "Delete failed");
     }
   };
+  const handleLogout = async () => {
+    try {
+      await logoutApi().unwrap();
+      dispatch(logout());
+      toast.success("👋 Account deleted");
+      navigate("/login");
+    } catch (err) {
+      toast.error(err?.data?.message || "Delete failed");
+    }
+  };
   if (isLoading) return <Loader />;
 
   return (
@@ -99,7 +112,7 @@ const Profile = () => {
 
         <button
           type="submit"
-          className="w-full bg-indigo-600 text-white py-2 rounded mb-3"
+          className="w-full bg-green-500 text-white py-2 rounded mb-3 hover:cursor-pointer hover:bg-green-700"
         >
           {isUpdating ? <LoaderMini /> : "Update Profile"}
         </button>
@@ -107,9 +120,16 @@ const Profile = () => {
         <button
           type="button"
           onClick={handleDelete}
-          className="w-full bg-red-600 text-white py-2 rounded"
+          className="w-full bg-red-500 text-white py-2 rounded mb-3 hover:cursor-pointer hover:bg-red-700"
         >
           Delete Account
+        </button>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="w-full bg-blue-500 text-white py-2 rounded hover:cursor-pointer hover:bg-blue-700"
+        >
+          Logout
         </button>
       </form>
     </div>
