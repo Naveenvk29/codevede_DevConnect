@@ -11,8 +11,17 @@ import {
   createRoutesFromElements,
 } from "react-router-dom";
 
+//
+import Signup from "./page/auth/signup.jsx";
+import Login from "./page/auth/login.jsx";
+
 const router = createBrowserRouter(
-  createRoutesFromElements(<Route path="" element={<App />}></Route>)
+  createRoutesFromElements(
+    <Route path="" element={<App />}>
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/login" element={<Login />} />
+    </Route>
+  )
 );
 
 createRoot(document.getElementById("root")).render(

@@ -1,15 +1,18 @@
 import React from "react";
-
-import { ToastContainer, toast } from "react-toastify";
+import NavBar from "./components/NavBar";
+import { ToastContainer } from "react-toastify";
+import Footer from "./components/Footer";
+import { Outlet } from "react-router-dom";
 
 const App = () => {
-  const notify = () => toast.success("Wow so easy!");
-
   return (
-    <div>
-      <button onClick={notify}>Notify!</button>
+    <>
       <ToastContainer />
-    </div>
+
+      <NavBar />
+      <Outlet />
+      <Footer />
+    </>
   );
 };
 
