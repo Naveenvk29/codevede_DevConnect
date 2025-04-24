@@ -14,12 +14,23 @@ import {
 //
 import Signup from "./page/auth/signup.jsx";
 import Login from "./page/auth/login.jsx";
-
+import ResetPassword from "./page/auth/ResetPassword.jsx";
+import VerifyEmail from "./page/auth/VerifyEmail.jsx";
+import ForgotPassword from "./page/auth/ForgotPassword.jsx";
+import PrivateRoutes from "./page/user/PrivateRoutes.jsx";
+import Profile from "./page/user/Profile.jsx";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="" element={<App />}>
       <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+
+      <Route element={<PrivateRoutes />}>
+        <Route path="/profile" element={<Profile />} />
+      </Route>
     </Route>
   )
 );

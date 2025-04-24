@@ -207,7 +207,7 @@ const forgetPassword = asyncHandler(async (req, res) => {
 });
 
 const resetpassword = asyncHandler(async (req, res) => {
-  const token = req.query.token;
+  const token = req.body.token;
   const user = await User.findOne({
     resetPasswordToken: token,
     resetPasswordExpires: { $gt: Date.now() },

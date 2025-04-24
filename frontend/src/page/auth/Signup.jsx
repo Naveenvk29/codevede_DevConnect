@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSignupMutation } from "../../redux/api/userApi";
 import { setCredentials } from "../../redux/features/authSlice";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-
+import LoaderMini from "../../components/LoaderMini";
 const signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -13,12 +13,6 @@ const signup = () => {
   const [register, { isLoading }] = useSignupMutation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const { userInfo } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    if (userInfo) navigate("/");
-  }, [userInfo, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +23,10 @@ const signup = () => {
     try {
       const res = await register({ username, email, password }).unwrap();
       dispatch(setCredentials({ ...res }));
-      navigate("/");
+      toast.success(
+        "🎉 Registered successfully! Check your email for verification link."
+      );
+      navigate("/login");
     } catch (err) {
       toast.error(`⚠️ ${err?.data?.message || err.error}`);
     }
@@ -45,7 +42,7 @@ const signup = () => {
 
             <div>
               <label
-                for="email"
+                for="username"
                 className="block mb-1 text-gray-600 font-semibold"
               >
                 Username
@@ -53,6 +50,8 @@ const signup = () => {
               <input
                 type="text"
                 className="bg-indigo-50 px-4 py-2 outline-none rounded-md w-full"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div>
@@ -65,11 +64,13 @@ const signup = () => {
               <input
                 type="text"
                 className="bg-indigo-50 px-4 py-2 outline-none rounded-md w-full"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
               <label
-                for="email"
+                for="password"
                 className="block mb-1 text-gray-600 font-semibold"
               >
                 Password
@@ -77,11 +78,13 @@ const signup = () => {
               <input
                 type="password"
                 className="bg-indigo-50 px-4 py-2 outline-none rounded-md w-full"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div>
               <label
-                for="email"
+                for="password"
                 className="block mb-1 text-gray-600 font-semibold"
               >
                 confirm Password
@@ -89,12 +92,17 @@ const signup = () => {
               <input
                 type="password"
                 className="bg-indigo-50 px-4 py-2 outline-none rounded-md w-full"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </div>
           </div>
           <button className="mt-4 w-full bg-yellow-500 font-semibold py-2 rounded-md  tracking-wide">
-            {isLoading ? "signuping..." : "sign up"}
+            {isLoading ? <LoaderMini /> : "sign up"}
           </button>
+          <p className="text-center mt-5 text-gray-600 font-semibold">
+            Already have an account ? <Link to={"/login"}>login</Link>
+          </p>
         </div>
       </form>
     </div>

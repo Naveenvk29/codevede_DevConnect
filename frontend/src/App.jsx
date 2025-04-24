@@ -7,7 +7,7 @@ import { Outlet } from "react-router-dom";
 const App = () => {
   return (
     <>
-      <ToastContainer />
+      <ToastContainer position="top-center" />
 
       <NavBar />
       <Outlet />
